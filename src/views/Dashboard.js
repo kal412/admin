@@ -3,7 +3,7 @@ import "../styles/Dashboard.css";
 const Dashboard = () => {
   return (
     <div className="dashboard">
-      <h1>Rai nub</h1>
+      <h1>All database infos</h1>
     </div>
   );
 };

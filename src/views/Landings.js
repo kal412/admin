@@ -1,26 +1,57 @@
 import "../styles/Landings.css";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import storage from "../firebase";
 
 const Landing = () => {
   const [name, setName] = useState("");
-  const [image, setImage] = useState("");
+  const [image, setImage] = useState(null);
   const [title, setTitle] = useState("");
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    axios
+      .get("https://portfolio-api-kalyan.herokuapp.com/api/v1/index")
+      .then((res) => {
+        setName(res.data[0].landing[0].name);
+        setTitle(res.data[0].landing[0].title);
+      });
+  }, []);
+
+  async function uploadFile(folder, file) {
+    let snapshot = await storage
+      .ref(`${folder}/${file.name}`)
+      .put(file)
+      .then((snapshot) => {
+        return snapshot;
+      });
+    let url = await snapshot.ref.getDownloadURL().then((url) => {
+      // console.log(url)
+      return url;
+    });
+    return new Promise((resolve) => {
+      resolve(url);
+    });
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    var image_url = await uploadFile("images", image);
     let item = {
       name: name,
-      image: image,
+      image: image_url,
       title: title,
     };
-    e.preventDefault();
-    console.log(item);
     axios
       .patch(
-        "http://localhost:4000/api/v1/update-landing/6176e6d75359ff3fd6693110",
+        "https://portfolio-api-kalyan.herokuapp.com/api/v1/update-landing/6176e6d75359ff3fd6693110",
         item
       )
-      .then((response) => console.log(response.data));
+      .then((response) => {
+        setName("");
+        setTitle("");
+        e.target.reset();
+        alert("Data updated successfully");
+      });
   };
 
   return (
@@ -40,9 +71,8 @@ const Landing = () => {
         <div className="form-field">
           <input
             type="file"
-            value={image}
             onChange={(e) => {
-              setImage(e.target.value);
+              setImage(e.target.files[0]);
             }}
           />
           <label htmlFor="image">Image</label>

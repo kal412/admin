@@ -1,26 +1,26 @@
+import axios from "axios";
 import "../styles/Services.css";
+import { useEffect, useState } from "react";
+import ServiceCard from "../components/ServiceCard";
 
 const Services = () => {
+  const [service, setService] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get("https://portfolio-api-kalyan.herokuapp.com/api/v1/index")
+      .then((res) => {
+        setService(res.data[0].services);
+      });
+  }, []);
+
   return (
     <div className="services">
-      <form className="services-form">
-        <div className="form-field">
-          <label htmlFor="title">Title</label>
-          <input type="text" name="" />
-        </div>
-
-        <div className="form-field">
-          <label htmlFor="image">Image</label>
-          <input type="file" name="" />
-        </div>
-
-        <div className="form-field">
-          <label htmlFor="description">Description</label>
-          <input type="text" name="" />
-        </div>
-
-        <input type="submit" value="Add" />
-      </form>
+      {service.length === 0
+        ? "loading......"
+        : service.map((item) => {
+            return <ServiceCard service={item} />;
+          })}
     </div>
   );
 };

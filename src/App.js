@@ -14,6 +14,7 @@ function App() {
         <div className="sidebar">
           <Header />
         </div>
+        <div className="sidebar-margin"></div>
         <div className="views">
           <Switch>
             <Route exact path="/" component={Dashboard} />
